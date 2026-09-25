@@ -311,7 +311,28 @@
   </div>
 
   <script>
-    let tasks = [];
+    const STORAGE_KEY = 'todo-tasks';
+
+    let tasks = loadTasks();
+
+    function loadTasks() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return Array.isArray(saved) ? saved : [];
+      } catch (e) {
+        // 保存データが壊れている・localStorageが使えない場合は空から始める
+        return [];
+      }
+    }
+
+    function saveTasks() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      } catch (e) {
+        // 容量超過やプライベートブラウズ等で保存できなくても画面操作は続けられるようにする
+        console.warn('タスクを保存できませんでした', e);
+      }
+    }
 
     const PRIORITY_ORDER = { high: 3, mid: 2, low: 1 };
     const PRIORITY_LABEL = { high: '高', mid: '中', low: '低' };
@@ -442,6 +463,7 @@
       });
 
       sortTasksByPriority();
+      saveTasks();
       taskInput.value = '';
       dueInput.value = '';
       render();
@@ -463,12 +485,14 @@
       const task = tasks.find(t => t.id === id);
       if (task) {
         task.completed = !task.completed;
+        saveTasks();
         render();
       }
     }
 
     function deleteTask(id) {
       tasks = tasks.filter(t => t.id !== id);
+      saveTasks();
       render();
     }
 

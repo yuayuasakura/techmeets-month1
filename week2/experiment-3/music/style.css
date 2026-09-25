@@ -1,0 +1,234 @@
+/* ==========================================
+   基本設定
+   ========================================== */
+
+/* 余白や枠線を含めてサイズを計算する（レイアウトが崩れにくくなる） */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ページ全体：音楽アプリ風のダークな背景 */
+body {
+  background: linear-gradient(180deg, #1a1d29 0%, #0e0f15 100%);
+  background-attachment: fixed;
+  color: #e8e8ee;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+
+/* ==========================================
+   ヘッダー
+   ========================================== */
+
+.header {
+  text-align: center;
+  padding: 72px 20px 48px;
+}
+
+/* タイトル上の小さな英字ラベル */
+.header-label {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.3em;
+  color: #1ed760; /* アクセントカラー（緑） */
+  margin-bottom: 12px;
+}
+
+.header-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.header-text {
+  font-size: 15px;
+  color: #a0a3b1; /* 少し暗い文字色で本文と差をつける */
+}
+
+
+/* ==========================================
+   カード一覧（★Flexboxで横並びにする部分）
+   ========================================== */
+
+.card-list {
+  display: flex;           /* 子要素（カード）を横並びにする */
+  flex-wrap: wrap;         /* 入りきらないカードは次の行へ折り返す */
+  justify-content: center; /* カードを中央寄せにする */
+  gap: 24px;               /* カード同士のすき間 */
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px 64px;
+}
+
+
+/* ==========================================
+   カード本体
+   ========================================== */
+
+.card {
+  /* PCでは1行に3枚：(全体幅 − すき間2つ分) ÷ 3 */
+  width: calc((100% - 24px * 2) / 3);
+  background: #1f2230;
+  border-radius: 12px;
+  overflow: hidden; /* 画像の角もカードに合わせて丸くする */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  /* 浮き上がりと影の変化を0.3秒かけてなめらかにする */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ホバー時：少し上に浮き上がり、影が濃くなる */
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6);
+}
+
+
+/* ==========================================
+   カード画像とオーバーレイ
+   ========================================== */
+
+/* オーバーレイを重ねる基準にするため position: relative */
+.card-image {
+  position: relative;
+}
+
+.card-image img {
+  display: block;  /* 画像の下にできるすき間を消す */
+  width: 100%;
+  aspect-ratio: 1 / 1; /* 正方形を保つ */
+  object-fit: cover;
+}
+
+/* 画像の上に重ねる半透明の黒い膜（最初は透明で見えない） */
+.card-overlay {
+  position: absolute;
+  inset: 0; /* 上下左右0 = 画像全体を覆う */
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;            /* ▶アイコンを中央に置くためにFlexboxを使う */
+  justify-content: center;  /* 横方向の中央 */
+  align-items: center;      /* 縦方向の中央 */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* 丸い再生ボタン */
+.play-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #1ed760;
+  color: #0e0f15;
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 4px; /* ▶は左に寄って見えるので少し右へ補正 */
+  transform: scale(0.8);
+  transition: transform 0.3s ease;
+}
+
+/* カードにホバーしたらオーバーレイを表示し、▶を少し大きくする */
+.card:hover .card-overlay {
+  opacity: 1;
+}
+
+.card:hover .play-icon {
+  transform: scale(1);
+}
+
+
+/* ==========================================
+   カードの文字部分
+   ========================================== */
+
+.card-body {
+  padding: 18px 20px 22px;
+}
+
+/* ジャンル名の小さなラベル（バッジ） */
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 10px;
+  border-radius: 999px; /* 両端を丸くする */
+  margin-bottom: 10px;
+}
+
+/* J-pop用のバッジの色 */
+.badge-jpop {
+  background: rgba(30, 215, 96, 0.15);
+  color: #1ed760;
+}
+
+/* ボカロ用のバッジの色 */
+.badge-vocaloid {
+  background: rgba(57, 197, 187, 0.15);
+  color: #39c5bb;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.card-artist {
+  font-size: 13px;
+  color: #a0a3b1;
+  margin-bottom: 10px;
+}
+
+.card-text {
+  font-size: 14px;
+  color: #c4c6d0;
+}
+
+
+/* ==========================================
+   フッター
+   ========================================== */
+
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: #6b6e7c;
+  padding: 24px 0 40px;
+}
+
+
+/* ==========================================
+   レスポンシブ対応（画面幅でカードの列数を変える）
+   ========================================== */
+
+/* タブレット（幅900px以下）：1行に2枚 */
+@media (max-width: 900px) {
+  .card {
+    width: calc((100% - 24px) / 2);
+  }
+}
+
+/* スマートフォン（幅600px以下）：1行に1枚 */
+@media (max-width: 600px) {
+  .header {
+    padding: 48px 16px 32px;
+  }
+
+  .header-title {
+    font-size: 24px;
+  }
+
+  .card-list {
+    padding: 0 16px 48px;
+  }
+
+  .card {
+    width: 100%;
+  }
+}

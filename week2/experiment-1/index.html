@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スライドショー</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f4f4f4;
+      font-family: sans-serif;
+    }
+
+    .slideshow {
+      width: 100%;
+      max-width: 600px;
+      padding: 16px;
+    }
+
+    .slideshow__image {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 2 / 1;
+      border-radius: 8px;
+      background: #ddd;
+    }
+
+    .slideshow__controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+
+    .slideshow__button {
+      padding: 8px 20px;
+      font-size: 16px;
+      color: #fff;
+      background: #333;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .slideshow__button:hover {
+      background: #555;
+    }
+
+    .slideshow__counter {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="slideshow">
+    <img class="slideshow__image" id="slide-image" src="" alt="">
+    <div class="slideshow__controls">
+      <button class="slideshow__button" id="prev-button" type="button">← 前へ</button>
+      <span class="slideshow__counter" id="slide-counter"></span>
+      <button class="slideshow__button" id="next-button" type="button">次へ →</button>
+    </div>
+  </div>
+
+  <script>
+    // placehold.jp は URL パラメータで背景色・文字を指定できる
+    const slides = [
+      'https://placehold.jp/3d4070/ffffff/600x300.png?text=Slide%201',
+      'https://placehold.jp/70403d/ffffff/600x300.png?text=Slide%202',
+      'https://placehold.jp/3d7040/ffffff/600x300.png?text=Slide%203',
+      'https://placehold.jp/60603d/ffffff/600x300.png?text=Slide%204',
+      'https://placehold.jp/5a3d70/ffffff/600x300.png?text=Slide%205',
+    ];
+
+    const image = document.getElementById('slide-image');
+    const counter = document.getElementById('slide-counter');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+
+    let currentIndex = 0;
+
+    function showSlide(index) {
+      // 端まで来たら反対側へループする
+      currentIndex = (index + slides.length) % slides.length;
+      image.src = slides[currentIndex];
+      image.alt = `スライド ${currentIndex + 1}`;
+      counter.textContent = `${currentIndex + 1} / ${slides.length}`;
+    }
+
+    prevButton.addEventListener('click', () => showSlide(currentIndex - 1));
+    nextButton.addEventListener('click', () => showSlide(currentIndex + 1));
+
+    showSlide(0);
+  </script>
+</body>
+</html>

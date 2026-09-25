@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プロフィール</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      background-color: #f0f0f0;
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      color: #333;
+    }
+
+    .card {
+      width: 400px;
+      max-width: 100%;
+      padding: 40px 32px;
+      background-color: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      text-align: center;
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .name {
+      margin-top: 16px;
+      font-size: 24px;
+    }
+
+    .comment {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+      list-style: none;
+    }
+
+    .skill {
+      padding: 4px 12px;
+      border-radius: 999px;
+      background-color: #e6f0ff;
+      color: #2a5bd7;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img class="avatar" src="https://placehold.jp/100x100.png" alt="アイコン">
+    <h1 class="name" id="name"></h1>
+    <p class="comment" id="comment"></p>
+    <ul class="skills" id="skills"></ul>
+  </main>
+
+  <script>
+    const profile = {
+      name: "山田 太郎",
+      comment: "毎日少しずつ、楽しくコードを書いています。",
+      skills: ["HTML", "CSS", "JavaScript", "Git", "Figma"],
+    };
+
+    document.getElementById("name").textContent = profile.name;
+    document.getElementById("comment").textContent = profile.comment;
+
+    const skillList = document.getElementById("skills");
+    profile.skills.forEach((skill) => {
+      const li = document.createElement("li");
+      li.className = "skill";
+      li.textContent = skill;
+      skillList.appendChild(li);
+    });
+  </script>
+</body>
+</html>

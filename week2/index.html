@@ -183,6 +183,12 @@
     background: #e2f6e5;
   }
 
+  /* 締切超過（未完了のみ）: 優先度の色より優先して赤く強調する */
+  .task-item.overdue {
+    background: #ffc9c9;
+    box-shadow: inset 0 0 0 2px #e03131;
+  }
+
   .task-main {
     flex: 1;
     display: flex;
@@ -378,6 +384,9 @@
       visibleTasks.forEach(task => {
         const li = document.createElement('li');
         li.className = 'task-item priority-' + task.priority + (task.completed ? ' completed' : '');
+        if (!task.completed && task.due && getDaysUntil(task.due) < 0) {
+          li.classList.add('overdue');
+        }
 
         const main = document.createElement('div');
         main.className = 'task-main';
@@ -419,14 +428,19 @@
       return new Date(y, m - 1, d);
     }
 
+    // 今日から締切日までの日数（過ぎていれば負の値）
+    function getDaysUntil(due) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return Math.round((parseDate(due) - today) / (1000 * 60 * 60 * 24));
+    }
+
     function createDueLabel(due) {
       const label = document.createElement('span');
       label.className = 'task-due';
 
       const dueDate = parseDate(due);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const diffDays = Math.round((dueDate - today) / (1000 * 60 * 60 * 24));
+      const diffDays = getDaysUntil(due);
 
       let note = '';
       if (diffDays < 0) {

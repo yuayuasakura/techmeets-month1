@@ -38,12 +38,13 @@
 
   .input-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 20px;
   }
 
   #task-input {
-    flex: 1;
+    flex: 1 1 100%;
     padding: 10px 14px;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -68,6 +69,23 @@
   }
 
   #priority-select:focus {
+    border-color: #6c8cff;
+  }
+
+  #due-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    color: #333;
+    font-family: inherit;
+  }
+
+  #due-input:focus {
     border-color: #6c8cff;
   }
 
@@ -146,13 +164,40 @@
     background: #4caf7d;
   }
 
-  .task-text {
+  .task-body {
     flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-right: 10px;
+  }
+
+  .task-text {
     cursor: pointer;
     font-size: 15px;
     color: #333;
     word-break: break-word;
-    padding-right: 10px;
+  }
+
+  .task-due {
+    font-size: 12px;
+    color: #777;
+  }
+
+  .task-due.due-today {
+    color: #d98200;
+    font-weight: bold;
+  }
+
+  .task-due.overdue {
+    color: #e03131;
+    font-weight: bold;
+  }
+
+  .task-item.completed .task-due {
+    color: #aaa;
+    font-weight: normal;
   }
 
   .task-item.completed .task-text {
@@ -202,6 +247,7 @@
         <option value="mid" selected>中</option>
         <option value="low">低</option>
       </select>
+      <input type="date" id="due-input" title="締切日">
       <button id="add-btn">追加</button>
     </div>
     <ul id="task-list"></ul>
@@ -216,6 +262,7 @@
 
     const taskInput = document.getElementById('task-input');
     const prioritySelect = document.getElementById('priority-select');
+    const dueInput = document.getElementById('due-input');
     const addBtn = document.getElementById('add-btn');
     const taskList = document.getElementById('task-list');
     const taskCount = document.getElementById('task-count');
@@ -243,13 +290,21 @@
         badge.className = 'priority-badge priority-' + task.priority;
         badge.textContent = PRIORITY_LABEL[task.priority];
 
+        const body = document.createElement('div');
+        body.className = 'task-body';
+
         const span = document.createElement('span');
         span.className = 'task-text';
         span.textContent = task.text;
         span.addEventListener('click', () => toggleTask(task.id));
+        body.appendChild(span);
+
+        if (task.due) {
+          body.appendChild(createDueLabel(task.due));
+        }
 
         main.appendChild(badge);
-        main.appendChild(span);
+        main.appendChild(body);
 
         const delBtn = document.createElement('button');
         delBtn.className = 'delete-btn';
@@ -260,6 +315,36 @@
         li.appendChild(delBtn);
         taskList.appendChild(li);
       });
+    }
+
+    // "YYYY-MM-DD" をローカル時刻の日付として解釈する（new Date(str) だとUTC扱いになるため）
+    function parseDate(str) {
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function createDueLabel(due) {
+      const label = document.createElement('span');
+      label.className = 'task-due';
+
+      const dueDate = parseDate(due);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const diffDays = Math.round((dueDate - today) / (1000 * 60 * 60 * 24));
+
+      let note = '';
+      if (diffDays < 0) {
+        label.classList.add('overdue');
+        note = `（${-diffDays}日超過）`;
+      } else if (diffDays === 0) {
+        label.classList.add('due-today');
+        note = '（今日）';
+      } else {
+        note = `（あと${diffDays}日）`;
+      }
+
+      label.textContent = `締切: ${dueDate.getFullYear()}/${dueDate.getMonth() + 1}/${dueDate.getDate()} ${note}`;
+      return label;
     }
 
     function renderCount() {
@@ -277,16 +362,26 @@
         id: Date.now(),
         text: text,
         completed: false,
-        priority: prioritySelect.value
+        priority: prioritySelect.value,
+        due: dueInput.value  // 未設定なら空文字
       });
 
       sortTasksByPriority();
       taskInput.value = '';
+      dueInput.value = '';
       render();
     }
 
     function sortTasksByPriority() {
-      tasks.sort((a, b) => PRIORITY_ORDER[b.priority] - PRIORITY_ORDER[a.priority]);
+      // 優先度が同じなら締切が近い順（締切なしは後ろ）
+      tasks.sort((a, b) => {
+        const diff = PRIORITY_ORDER[b.priority] - PRIORITY_ORDER[a.priority];
+        if (diff !== 0) return diff;
+        if (a.due === b.due) return 0;
+        if (!a.due) return 1;
+        if (!b.due) return -1;
+        return a.due < b.due ? -1 : 1;
+      });
     }
 
     function toggleTask(id) {

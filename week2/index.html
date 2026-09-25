@@ -104,6 +104,54 @@
     background: #5675e0;
   }
 
+  .filter-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .status-filter {
+    display: flex;
+    gap: 6px;
+  }
+
+  .filter-btn {
+    flex: 1;
+    padding: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+
+  .filter-btn:hover {
+    border-color: #6c8cff;
+  }
+
+  .filter-btn.active {
+    background: #6c8cff;
+    border-color: #6c8cff;
+    color: #fff;
+  }
+
+  #search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #search-input:focus {
+    border-color: #6c8cff;
+  }
+
   #task-list {
     list-style: none;
     margin: 0;
@@ -250,6 +298,14 @@
       <input type="date" id="due-input" title="締切日">
       <button id="add-btn">追加</button>
     </div>
+    <div class="filter-row">
+      <div class="status-filter">
+        <button class="filter-btn active" data-filter="all">すべて</button>
+        <button class="filter-btn" data-filter="active">未完了のみ</button>
+        <button class="filter-btn" data-filter="completed">完了済みのみ</button>
+      </div>
+      <input type="search" id="search-input" placeholder="タスク名で検索...">
+    </div>
     <ul id="task-list"></ul>
     <p class="task-count" id="task-count"></p>
   </div>
@@ -266,20 +322,39 @@
     const addBtn = document.getElementById('add-btn');
     const taskList = document.getElementById('task-list');
     const taskCount = document.getElementById('task-count');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const searchInput = document.getElementById('search-input');
+
+    let statusFilter = 'all';  // 'all' | 'active' | 'completed'
+    let searchKeyword = '';
+
+    function getVisibleTasks() {
+      const keyword = searchKeyword.trim().toLowerCase();
+      return tasks.filter(task => {
+        if (statusFilter === 'active' && task.completed) return false;
+        if (statusFilter === 'completed' && !task.completed) return false;
+        if (keyword !== '' && !task.text.toLowerCase().includes(keyword)) return false;
+        return true;
+      });
+    }
 
     function render() {
       taskList.innerHTML = '';
       renderCount();
 
-      if (tasks.length === 0) {
+      const visibleTasks = getVisibleTasks();
+
+      if (visibleTasks.length === 0) {
         const empty = document.createElement('li');
         empty.className = 'empty-message';
-        empty.textContent = 'タスクがありません';
+        empty.textContent = tasks.length === 0
+          ? 'タスクがありません'
+          : '条件に一致するタスクがありません';
         taskList.appendChild(empty);
         return;
       }
 
-      tasks.forEach(task => {
+      visibleTasks.forEach(task => {
         const li = document.createElement('li');
         li.className = 'task-item priority-' + task.priority + (task.completed ? ' completed' : '');
 
@@ -403,6 +478,19 @@
       if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) {
         addTask();
       }
+    });
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        statusFilter = btn.dataset.filter;
+        filterBtns.forEach(b => b.classList.toggle('active', b === btn));
+        render();
+      });
+    });
+
+    searchInput.addEventListener('input', () => {
+      searchKeyword = searchInput.value;
+      render();
     });
 
     render();

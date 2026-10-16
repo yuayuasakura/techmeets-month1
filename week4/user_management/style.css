@@ -1,0 +1,8 @@
+body {font-family: sans-serif;}
+
+table {border-collapse: collapse; margin-top: 16px;}
+th, td {border: 1px solid #ccc; padding: 6px 12px; text-align: left;}
+th {background: #f0f0f0;}
+
+.inline-form {display: inline;}
+.error {color: red;}

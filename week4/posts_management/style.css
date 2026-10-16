@@ -1,0 +1,12 @@
+body {font-family: sans-serif;}
+
+table {border-collapse: collapse; margin-top: 16px;}
+th, td {border: 1px solid #ccc; padding: 6px 12px; text-align: left;}
+th {background: #f0f0f0;}
+
+input[type="text"], textarea {width: 100%; max-width: 600px; box-sizing: border-box; margin-bottom: 8px;}
+
+.inline-form {display: inline;}
+.error {color: red;}
+.meta {color: #666; font-size: 0.9em;}
+.content {margin: 16px 0; line-height: 1.7;}
